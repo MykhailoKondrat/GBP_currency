@@ -1,0 +1,13 @@
+.App {
+  text-align: left;
+}
+table{
+  background-color: lightcyan;
+
+}
+tr:nth-child(odd){
+  background-color: lightblue;
+}
+td,th{
+  padding: 8px;
+}

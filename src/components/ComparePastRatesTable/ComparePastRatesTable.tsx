@@ -1,4 +1,14 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+
 import { IComparePastRatesTable } from '../../interfaces/interfaces';
 
 const ComparePastRatesTable = ({
@@ -9,6 +19,42 @@ const ComparePastRatesTable = ({
   historyRateDay1,
   historyRateDay2,
 }: IComparePastRatesTable) => {
+  const calculateDifference = (dateOne: number, dateTwo: number): number => {
+    console.log(dateOne, dateTwo);
+    // let's assume rate for date1 is 100%
+    // so date2 in percent relative to date1:
+    const date2InPercents = (dateTwo * 100) / dateOne;
+    // rounding to 4 digits after coma
+    const diff = date2InPercents - 100;
+    const rounded = diff.toFixed(4);
+    // calculating difference between date1(100 % in this case) and date2( @rounded)
+    const result = Number(rounded);
+    return result;
+  };
+
+  const data = [
+    {
+      name: 'USD',
+      diff: calculateDifference(
+        historyRateDay1?.rates?.[date1]?.USD,
+        historyRateDay2?.rates?.[date2]?.USD
+      ),
+    },
+    {
+      name: 'EUR',
+      diff: calculateDifference(
+        historyRateDay1?.rates?.[date1]?.EUR,
+        historyRateDay2?.rates?.[date2]?.EUR
+      ),
+    },
+    {
+      name: 'SGD',
+      diff: calculateDifference(
+        historyRateDay1?.rates?.[date1]?.SGD,
+        historyRateDay2?.rates?.[date2]?.SGD
+      ),
+    },
+  ];
   return (
     <>
       <h2>
@@ -70,6 +116,27 @@ const ComparePastRatesTable = ({
           )}
         </tbody>
       </table>
+      {historyRateDay1?.rates?.[date1] && historyRateDay2?.rates?.[date2] ? (
+        <BarChart width={730} height={250} data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" />
+          <YAxis unit="%" />
+          <Tooltip />
+          <Bar dataKey="diff">
+            {data.map((entry, index) => {
+              return (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={entry.diff > 0 ? 'green' : 'red'}
+                  strokeWidth={index === 2 ? 4 : 1}
+                />
+              );
+            })}
+          </Bar>
+        </BarChart>
+      ) : (
+        <p>Not sufficient data to display a chart</p>
+      )}
     </>
   );
 };

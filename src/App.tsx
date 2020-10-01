@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import './App.css';
+
 import {
   saveCurrentRate,
   saveHistoryRateDay1,
@@ -61,7 +62,6 @@ function App() {
       dispatch(saveToLocalStorage());
     });
   }, [day1Rates, day2Rates, dispatch, latestRates]);
-
   return (
     <div className="App">
       <h2>

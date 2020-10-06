@@ -1,3 +1,5 @@
+import store from '../store/store';
+
 interface IRates {
   EUR: number;
   SGD: number;
@@ -5,6 +7,26 @@ interface IRates {
 }
 interface IHistoryRates {
   [key: string]: IRates;
+}
+export interface ICurrentRateTable {
+  baseCurrency: string;
+  baseAmount: number;
+  currentRate: ICurrentRateResponse;
+}
+export interface IComparePastRatesTable {
+  date1: string;
+  date2: string;
+  baseAmount: number;
+  baseCurrency: string;
+  historyRateDay1: IHistoryRateResponse;
+  historyRateDay2: IHistoryRateResponse;
+}
+export interface IFormProps {
+  baseAmount: number;
+  baseCurrency: string;
+  date1: string;
+  date2: string;
+  latestRates: string;
 }
 // typing response from server - obj fields should match so can't use camelCase
 export interface ICurrentRateResponse {
@@ -24,7 +46,8 @@ export interface IHistoryRateResponse {
 }
 export interface IAppSliceState<T, U> {
   setup: {
-    baseAmountOfGbp: number;
+    baseAmount: number;
+    baseCurrency: string;
     date1: string;
     date2: string;
   };

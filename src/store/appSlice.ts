@@ -14,10 +14,11 @@ export const getCurrency = createAsyncThunk<ICurrentRateResponse, string>(
   }
 );
 const initialState =
-  JSON.parse(<string>localStorage.getItem('GBP_Currency')) ??
+  JSON.parse(localStorage.getItem('GBP_Currency') as string) ??
   ({
     setup: {
-      baseAmountOfGbp: 200,
+      baseAmount: 200,
+      baseCurrency: 'GBP',
       date1: '2015-03-25',
       date2: '2016-06-13',
     },
@@ -31,32 +32,61 @@ export const appSlice = createSlice({
   name: 'appSlice',
   initialState,
   reducers: {
-    saveCurrentRate: (state, { payload }) => {
+    updateBaseValues: (
+      state: IAppSliceState<ICurrentRateResponse, IHistoryRateResponse>,
+      { payload }
+    ) => {
+      state.setup.baseAmount = payload.baseAmount;
+      state.setup.baseCurrency = payload.baseCurrency;
+      state.setup.date1 = payload.dateOne;
+      state.setup.date2 = payload.dateTwo;
+    },
+    saveCurrentRate: (
+      state: IAppSliceState<ICurrentRateResponse, IHistoryRateResponse>,
+      { payload }
+    ) => {
       state.currentRate = payload;
     },
-    saveHistoryRateDay1: (state, { payload }) => {
-      state.historyRateDay1 = payload;
+    saveHistoryRateDay1: (
+      state: IAppSliceState<ICurrentRateResponse, IHistoryRateResponse>,
+      { payload }
+    ) => {
+      state.historyRateDay1 = payload ?? {};
     },
-    saveHistoryRateDay2: (state, { payload }) => {
-      state.historyRateDay2 = payload;
+    saveHistoryRateDay2: (
+      state: IAppSliceState<ICurrentRateResponse, IHistoryRateResponse>,
+      { payload }
+    ) => {
+      state.historyRateDay2 = payload ?? {};
     },
-    saveToLocalStorage: (state) => {
+    saveToLocalStorage: (
+      state: IAppSliceState<ICurrentRateResponse, IHistoryRateResponse>
+    ) => {
       localStorage.setItem('GBP_Currency', JSON.stringify(state));
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(getCurrency.fulfilled, (state) => {
-      state.loading = false;
-      state.error = false;
-    });
-    builder.addCase(getCurrency.pending, (state) => {
-      state.loading = true;
-      state.error = false;
-    });
-    builder.addCase(getCurrency.rejected, (state) => {
-      state.loading = false;
-      state.error = true;
-    });
+    builder.addCase(
+      getCurrency.fulfilled,
+      (state: IAppSliceState<ICurrentRateResponse, IHistoryRateResponse>) => {
+        state.loading = false;
+        state.error = false;
+      }
+    );
+    builder.addCase(
+      getCurrency.pending,
+      (state: IAppSliceState<ICurrentRateResponse, IHistoryRateResponse>) => {
+        state.loading = true;
+        state.error = false;
+      }
+    );
+    builder.addCase(
+      getCurrency.rejected,
+      (state: IAppSliceState<ICurrentRateResponse, IHistoryRateResponse>) => {
+        state.loading = false;
+        state.error = true;
+      }
+    );
   },
 });
 export const {
@@ -64,5 +94,6 @@ export const {
   saveHistoryRateDay1,
   saveHistoryRateDay2,
   saveToLocalStorage,
+  updateBaseValues,
 } = appSlice.actions;
 export default appSlice.reducer;
